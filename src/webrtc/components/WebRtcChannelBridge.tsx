@@ -24,16 +24,13 @@ class WebRtcChannelBridge extends Component<Props> {
   componentDidUpdate = () => this.checkQueue()
 
   checkQueue = () => {
-    console.log('checkQueue')
     const { queue, webRtcClearQueue } = this.props
-    console.log('componentDidUpdate', queue)
 
     if (queue.length > 0) {
       queue.forEach(q =>
         this.webViewRef!.postMessage(JSON.stringify(q)))
       webRtcClearQueue()
     }
-    return null
   }
 
   onMessage = (data: string) => {
@@ -45,13 +42,12 @@ class WebRtcChannelBridge extends Component<Props> {
   }
 
   render() {
-    console.log('rerender')
     return (
       <>
       <Text>This bridge {this.props.queue!.length}</Text>
       <WebView
         ref={(ref) => this.webViewRef = ref}
-        // style={{ display: 'none' }}
+        style={{ display: 'none' }}
         originWhitelist={['*']}
         onError={ (err) => console.log(`WEBVIEW error`, err) }
         onLoad={this.checkQueue}
