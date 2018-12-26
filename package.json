@@ -1,0 +1,35 @@
+{
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "eject": "expo eject"
+  },
+  "dependencies": {
+    "@types/react": "^16.7.18",
+    "@types/react-native": "^0.57.23",
+    "@types/react-redux": "^6.0.11",
+    "@types/redux-logger": "^3.0.6",
+    "expo": "^31.0.2",
+    "prop-types": "^15.6.2",
+    "qrcode.react": "^0.8.0",
+    "react": "^16.7.0-alpha.2",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz",
+    "react-native-camera": "^1.6.4",
+    "react-native-qrcode-scanner": "^1.1.0",
+    "react-native-webrtc": "^1.67.1",
+    "react-qr-reader": "^2.1.1",
+    "react-redux": "5",
+    "redux": "^3.7.2",
+    "redux-act": "^1.7.4",
+    "redux-logger": "^3.0.6",
+    "redux-saga": "^0.16.2",
+    "schedule": "0.4.0",
+    "webrtc-datachannel": "^0.2.1"
+  },
+  "devDependencies": {
+    "babel-preset-expo": "^5.0.0"
+  },
+  "private": true
+}
