@@ -1,12 +1,28 @@
-import { take, fork, put } from 'redux-saga/effects'
-import { delay } from 'redux-saga'
-import { webRtcSendMsg, webRtcRecieveMsg } from '../actions'
+import { take, fork, put, call } from 'redux-saga/effects'
+import { webRtcSendMsg, webRtcRecieveMsg, qrRequestReceived, webRtcIsReady } from '../actions'
 
-function* watchForRtcMessage() {
+function* sendRtcMessage(...props: any[]) {
+  yield put(webRtcSendMsg({ method: 'send', props }))
+}
+
+function* initByRequest(request: string) {
+  yield put(webRtcSendMsg({ method: 'initByRequest', props: [ request ] }))
+}
+
+function* watchForRtcConnectionSaga() {
   while (true) try {
-    const { payload } = yield take(webRtcRecieveMsg)
+    const { payload } = yield take(webRtcRecieveMsg) // TODO: Add typings
     console.log({payload})
 
+    switch (payload.method) {
+      case 'initByRequest':
+        yield call(sendRtcMessage, { method: 'answer', props: { spd: payload.props.answer } })
+        yield call(sendRtcMessage, { method: 'channelOpened' })
+        break
+      case 'channelOpened':
+        yield put(webRtcIsReady(true))
+        break
+    }
   } catch (err) {
     console.log(err)
   }
@@ -14,14 +30,13 @@ function* watchForRtcMessage() {
 
 export default function* rootSaga() {
   try {
-    console.log('saga started')
-    yield fork(watchForRtcMessage)
+    yield fork(watchForRtcConnectionSaga)
 
-    // Yes, we can push messages immideately without waiting for vebview will be ready
-    yield put(webRtcSendMsg({ method: 'initiateConnect', props: [] }))
+    const { payload: request } = yield take(qrRequestReceived) // Move this action to other duck
+    yield call(initByRequest, request)
 
-    yield delay(3000)
-    yield put(webRtcSendMsg({ method: 'initiateConnect', props: [] }))
+    yield take(webRtcIsReady)
+    console.log('Wow! Datachannel connection is ready!')
 
   } catch (err) {
     console.log(err)
