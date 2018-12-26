@@ -1,11 +1,11 @@
 import { take, fork, put, call } from 'redux-saga/effects'
-import { webRtcSendMsg, webRtcRecieveMsg, qrRequestReceived, webRtcIsReady } from '../actions'
+import { webRtcSendMsg, webRtcRecieveMsg, qrRequestReceived, webRtcIsReady, sendRtcMessage } from '../actions'
 
-function* sendRtcMessage(...props: any[]) {
+function* sendRtcMessageSaga(...props: any[]) {
   yield put(webRtcSendMsg({ method: 'send', props }))
 }
 
-function* initByRequest(request: string) {
+function* initByRequestSaga(request: string) {
   yield put(webRtcSendMsg({ method: 'initByRequest', props: [ request ] }))
 }
 
@@ -16,8 +16,8 @@ function* watchForRtcConnectionSaga() {
 
     switch (payload.method) {
       case 'initByRequest':
-        yield call(sendRtcMessage, { method: 'answer', props: { spd: payload.props.answer } })
-        yield call(sendRtcMessage, { method: 'channelOpened' })
+        yield call(sendRtcMessageSaga, { method: 'answer', props: { spd: payload.props.answer } })
+        yield call(sendRtcMessageSaga, { method: 'channelOpened' })
         break
       case 'channelOpened':
         yield put(webRtcIsReady(true))
@@ -28,16 +28,24 @@ function* watchForRtcConnectionSaga() {
   }
 }
 
+function* watchForSendMessageRequestsSaga() {
+  while (true) {
+    const { payload } = yield take(sendRtcMessage)
+    yield call(sendRtcMessageSaga, payload)
+  }
+}
+
 export default function* rootSaga() {
   try {
     yield fork(watchForRtcConnectionSaga)
 
     const { payload: request } = yield take(qrRequestReceived) // Move this action to other duck
-    yield call(initByRequest, request)
+    yield call(initByRequestSaga, request)
 
     yield take(webRtcIsReady)
-    console.log('Wow! Datachannel connection is ready!')
+    console.log('Datachannel connection is ready')
 
+    yield fork(watchForSendMessageRequestsSaga)
   } catch (err) {
     console.log(err)
   }

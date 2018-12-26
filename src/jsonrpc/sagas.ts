@@ -18,7 +18,8 @@ function* watchForRtcMessagesSaga() {
 }
 
 export default function* rootSaga() {
-  yield fork(watchForRtcMessagesSaga)
   yield take(webRtcIsReady)
+
+  yield fork(watchForRtcMessagesSaga)
   yield put(sendRtcMessage({ method: 'getWalletsList' }))
 }
