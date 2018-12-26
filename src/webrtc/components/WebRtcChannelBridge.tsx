@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect, MapStateToProps } from 'react-redux'
-import { WebView, Text } from 'react-native'
+import { WebView } from 'react-native'
 
 import webViewScript from './WebRtcChannelWebView'
 import { webRtcRecieveMsg, webRtcClearQueue } from '../actions'
@@ -43,8 +43,6 @@ class WebRtcChannelBridge extends Component<Props> {
 
   render() {
     return (
-      <>
-      <Text>This bridge {this.props.queue!.length}</Text>
       <WebView
         ref={(ref) => this.webViewRef = ref}
         style={{ display: 'none' }}
@@ -61,7 +59,6 @@ class WebRtcChannelBridge extends Component<Props> {
         onNavigationStateChange={ (ev) => console.log(`WEBVIEW nav state change`, ev) }
         onMessage={ (ev) => this.onMessage(ev.nativeEvent.data) }
       />
-      </>
     )
   }
 }
